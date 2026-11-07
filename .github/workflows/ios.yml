@@ -46,5 +46,5 @@ jobs:
       - name: Descargar compilación
         uses: actions/upload-artifact@v4
         with:
-          name: Mi-museo-iOS
+          name: Collectoholic-iOS
           path: build/Build/Products/Debug-iphonesimulator/Collectoholic-iOS.zip
