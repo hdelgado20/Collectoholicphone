@@ -1,0 +1,50 @@
+name: Compilar iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Preparar iOS
+        run: |
+          if [ ! -d ios ]; then
+            npx cap add ios
+          fi
+          npx cap sync ios
+
+      - name: Compilar aplicación
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Crear archivo
+        run: |
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r Collectoholic-iOS.zip App.app
+
+      - name: Descargar compilación
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mi-museo-iOS
+          path: build/Build/Products/Debug-iphonesimulator/Collectoholic-iOS.zip
